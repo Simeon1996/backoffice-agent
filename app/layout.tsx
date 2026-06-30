@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
+import { Providers } from "./providers";
+import { AppShell } from "@/components/shell/AppShell";
 
 const fraunces = localFont({
   src: [
@@ -28,7 +30,11 @@ export default function RootLayout({
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
+      </body>
     </html>
   );
 }
