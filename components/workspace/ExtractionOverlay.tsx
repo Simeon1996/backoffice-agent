@@ -29,6 +29,7 @@ export function ExtractionOverlay({
   useLayoutEffect(() => {
     const cont = containerRef.current;
     if (!cont) return;
+    let raf = 0;
     const measure = () => {
       const base = cont.getBoundingClientRect();
       const map: Record<string, Rect> = {};
@@ -41,14 +42,18 @@ export function ExtractionOverlay({
       setRects(map);
     };
     measure();
+    // re-measure after the browser has settled layout/fonts
+    raf = requestAnimationFrame(measure);
     const ro = new ResizeObserver(measure);
     ro.observe(cont);
     window.addEventListener("resize", measure);
     return () => {
+      cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [containerRef, doc.id]);
+    // re-measure as more fields are revealed (cheap; layout is static)
+  }, [containerRef, doc.id, revealedIds.length]);
 
   const fieldLabel = (id: string) => docTypeById(doc.type)?.fields.find((f) => f.id === id)?.label ?? id;
   const confOf = (id: string) => doc.fields.find((f) => f.id === id)?.confidence ?? 1;
